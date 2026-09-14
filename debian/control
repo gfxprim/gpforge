@@ -1,0 +1,15 @@
+Source: gpforge
+Priority: optional
+Maintainer: Cyril Hrubis <metan@ucw.cz>
+Build-Depends: debhelper-compat (= 12), libgfxprim-dev
+Standards-Version: 4.0.0
+Section: graphics
+Homepage: http://gfxprim.ucw.cz/
+
+Package: gpforge
+Section: graphics
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libgfxprim1 (= ${binary:Version})
+Description: A bitmap font editor for gfxprim fonts
+ Bitmap font editor for gfxprim fonts, imports and exports BDF and exports
+ gfxprim C fonts.

@@ -1,0 +1,4 @@
+usr/bin/gpforge
+usr/bin/gpforge-cli
+etc/gp_apps/gpforge/*
+usr/share/applications/gpforge.desktop

@@ -1,0 +1,99 @@
+{
+ "info": {"version": 1, "license": "GPL-2.0-or-later"},
+ "layout": {
+  "type": "vbox",
+  "align": "fill",
+  "widgets": [
+   {"type": "hbox", "border": "none", "halign": "fill", "widgets": [
+    {"type": "label", "uid": "family", "text": "", "tattr": "bold"},
+    {"type": "button", "label": "Open", "btype": "open", "on_event": "open_on_event"},
+    {"type": "button", "label": "Save", "btype": "save", "uid": "save",
+     "on_event": "save_on_event"},
+    {"type": "button", "label": "Export", "btype": "save", "uid": "export",
+     "on_event": "export_on_event"},
+    {"type": "button", "label": "New", "btype": "add", "on_event": "new_on_event"},
+    {"type": "button", "label": "Font", "btype": "settings", "uid": "family_button",
+     "on_event": "family_on_event"},
+    {"type": "label", "uid": "lint_errors", "frame": true, "text": "", "text_color": "alert",
+     "tattr": "bold|center", "bg_color": "fg", "width": 2},
+    {"type": "label", "uid": "lint_warnings", "frame": true, "text": "", "text_color": "warn",
+     "tattr": "bold|center", "bg_color": "fg", "width": 2},
+    {"type": "button", "label": "lint", "btype": "next", "uid": "lint_button",
+     "on_event": "lint_on_event"}
+   ], "padd-fill": "0, 4, 0, 0, 0, 0, 0, 0, 0, 0", "cell-fill": "9*0"},
+   {"type": "hbox", "align": "fill", "border": "none", "widgets": [
+     {"type": "vbox", "align": "fill", "border": "none", "widgets": [
+       {"type": "pixmap", "w": "0px 4pad 20asc", "h": "0px 4pad 24asc",
+        "align": "fill", "uid": "canvas", "on_event": "canvas_on_event"},
+       {"type": "hbox", "halign": "fill", "border": "none", "widgets": [
+         {"type": "button", "label": "U", "btype": "rotate_ccw", "halign": "fill", "uid": "undo",
+          "on_event": "undo_on_event"},
+         {"type": "button", "label": "R", "btype": "rotate_cw", "halign": "fill", "uid": "redo",
+          "on_event": "redo_on_event"},
+         {"type": "button", "btype": "cancel", "halign": "fill", "uid": "glyph_del",
+          "on_event": "glyph_del_on_event"},
+         {"type": "button", "btype": "copy", "halign": "fill", "on_event": "copy_on_event"},
+         {"type": "button", "btype": "paste", "halign": "fill", "uid": "paste",
+          "on_event": "paste_on_event"},
+         {"type": "button", "btype": "left", "halign": "fill", "on_event": "move_left_on_event"},
+         {"type": "button", "btype": "right", "halign": "fill", "on_event": "move_right_on_event"},
+         {"type": "button", "btype": "up", "halign": "fill", "on_event": "move_up_on_event"},
+         {"type": "button", "btype": "down", "halign": "fill", "on_event": "move_down_on_event"},
+         {"type": "button", "btype": "mirror_h", "halign": "fill", "on_event": "flip_h_on_event"},
+         {"type": "button", "btype": "mirror_v", "halign": "fill", "on_event": "flip_v_on_event"},
+         {"type": "spinner", "min": 1, "max": 64, "val": 1, "uid": "canvas_zoom",
+          "on_event": "canvas_zoom_on_event"}
+       ]}
+     ], "cell-fill": "1, 0"},
+     {"type": "vbox", "align": "fill", "border": "none", "widgets": [
+       {"type": "hbox", "halign": "fill", "border": "none", "widgets": [
+         {"type": "spinbutton", "desc": "blocks_desc", "uid": "blocks",
+          "on_event": "blocks_on_event"},
+         {"type": "tbox", "uid": "block_start", "len": 5, "tattr": "mono",
+          "on_event": "block_start_on_event"},
+         {"type": "button", "btype": "add", "halign": "fill", "uid": "block_add",
+          "on_event": "block_add_on_event"},
+         {"type": "button", "btype": "clear", "halign": "fill", "uid": "block_del",
+          "on_event": "block_del_on_event"},
+         {"type": "button", "btype": "rem", "halign": "fill", "uid": "range_del",
+          "on_event": "glyph_range_del_on_event"},
+         {"type": "spinner", "min": 1, "max": 8, "val": 2, "uid": "zoom",
+          "on_event": "zoom_on_event"}
+       ], "cell-fill": "2 * 0, 3*4, 0"},
+       {"type": "pixmap", "w": "0px 4pad 32asc", "h": "0px 4pad 22asc",
+        "align": "fill", "uid": "browser", "on_event": "browser_on_event"},
+       {"type": "hbox", "align": "fill", "border": "none", "widgets": [
+        {"type": "pixmap", "w": "0px 4pad 30asc", "h": "0px 2pad 7asc",
+         "align": "fill", "uid": "deps", "on_event": "deps_on_event"},
+        {"type": "checkbox", "label": "update", "uid": "update",
+         "on_event": "update_on_event"}
+       ]}
+     ], "cell-fill": "0, 5, 1"}
+   ]},
+   {"type": "hbox", "widgets": [
+     {"type": "label", "uid": "status", "text": "", "width": 34, "tattr": "mono"},
+     {"type": "label", "text": "adv"},
+     {"type": "spinner", "min": 0, "max": 64, "val": 0, "uid": "advance",
+      "on_event": "advance_on_event"},
+     {"type": "label", "text": "brg"},
+     {"type": "spinner", "min": -32, "max": 64, "val": 0, "uid": "bearing_x",
+      "on_event": "bearing_x_on_event"},
+     {"type": "spinner", "min": -32, "max": 64, "val": 0, "uid": "bearing_y",
+      "on_event": "bearing_y_on_event"},
+     {"type": "pixmap", "w": "0px 8pad 26asc", "h": "0px 2pad 5asc", "uid": "strip",
+      "on_event": "strip_on_event"}
+   ]},
+   {"type": "label", "uid": "lint", "text": "", "width": 16,
+    "tattr": "mono|left", "halign": "fill"},
+   {"type": "hbox", "halign": "fill", "border": "none", "widgets": [
+     {"type": "tbox", "uid": "preview_text", "len": 40, "halign": "fill",
+      "help": "preview text", "on_event": "preview_text_on_event"},
+     {"type": "checkbox", "label": "underline", "on_event": "rule_under_on_event"},
+     {"type": "checkbox", "label": "line through", "on_event": "rule_strike_on_event"},
+     {"type": "checkbox", "label": "overline", "on_event": "rule_over_on_event"}
+   ], "cell-fill": "1, 0, 0, 0"},
+   {"type": "pixmap", "w": "0px 4pad 40asc", "h": "160px", "align": "fill",
+    "uid": "preview", "on_event": "preview_on_event"}
+  ], "cell-fill": "0, 1, 0, 0, 0, 1"
+ }
+}
