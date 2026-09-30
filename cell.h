@@ -47,6 +47,14 @@ struct gpf_cell {
 	unsigned int zoom;
 	/** @brief Where the grid starts in the pixmap, see gpf_cell_center(). */
 	int x0, y0;
+	/**
+	 * @brief The color the cells are drawn on, the selected one is
+	 *        highlighted instead.
+	 *
+	 * The foreground color set by gpf_cell_init(), a grid that follows the
+	 * focus of its widget sets it with gpf_gui_back_color().
+	 */
+	gp_pixel bg;
 };
 
 /**

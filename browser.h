@@ -25,7 +25,7 @@
  * @brief Paints the glyph table into its pixmap.
  *
  * Paints the current page of the block being browsed, with the selected
- * glyph highlighted.  Turns to the page with the selection first when
+ * glyph highlighted, on gpf_gui_back_color().  Turns to the page with the selection first when
  * gpf_gui::browser_follow asks for it.
  *
  * @param self The browser pixmap widget.

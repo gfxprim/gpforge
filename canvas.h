@@ -24,7 +24,9 @@
  *
  * Draws the pixel grid with its columns and rows numbered, the ink, the metric
  * lines, the cursor and its position.
- * With no font open it fills the background and returns.
+ * With no font open it fills the background and returns.  The background is
+ * the foreground color while the canvas is focused and the background color
+ * otherwise, so it is redrawn on a focus change.
  *
  * @param self The canvas pixmap widget.
  */

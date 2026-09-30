@@ -29,6 +29,8 @@ static int geometry(struct grid *self, gp_pixmap *p)
 
 	gpf_cell_init(&self->cell, ctx, 0);
 
+	self->cell.bg = gpf_gui_back_color(gui.browser);
+
 	self->cols = GPF_MAX(1u, p->w / self->cell.w);
 	self->rows = GPF_MAX(1u, p->h / self->cell.h);
 	self->page_cells = self->cols * self->rows;
@@ -75,7 +77,7 @@ void gpf_browser_draw(gp_widget *self)
 	if (!p)
 		return;
 
-	gp_fill(p, gp_widgets_color(ctx, GP_WIDGETS_COL_FG));
+	gp_fill(p, gp_widgets_color(ctx, GP_WIDGETS_COL_BG));
 
 	if (!gui.font)
 		return;

@@ -37,7 +37,7 @@ void gpf_preview_draw(gp_widget *self);
  * @brief Paints the variant strip.
  *
  * The selected glyph once per variant, as each of them resolves it, with the
- * variant being edited highlighted.
+ * variant being edited highlighted, on gpf_gui_back_color().
  *
  * @param self The variant strip pixmap widget.
  */
@@ -60,7 +60,7 @@ int gpf_strip_input(gp_event *ev);
  * Lists the accented forms of the selected letter, or of the letter the
  * selected glyph is an accented form of.  When a mark is selected it lists the
  * letters that wear it instead, each drawn composed with the mark being
- * edited.
+ * edited.  The selected glyph is highlighted, on gpf_gui_back_color().
  *
  * @param self The accented letters strip pixmap widget.
  */

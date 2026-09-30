@@ -34,6 +34,8 @@ void gpf_cell_init(struct gpf_cell *self, const gp_widget_render_ctx *ctx,
 	 */
 	self->pad = ctx->padd;
 
+	self->bg = gp_widgets_color(ctx, GP_WIDGETS_COL_FG);
+
 	self->label_h = gp_text_height(ctx->font_mono);
 
 	/* the band the reference character gets: its height and the padding */
@@ -94,7 +96,7 @@ static void label_colors(const gp_widget_render_ctx *ctx, uint32_t code,
 	                                  : NULL;
 
 	if (gpf_gui_modified(code)) {
-		*bg = gp_widgets_color(ctx, GP_WIDGETS_COL_RED);
+		*bg = gp_widgets_color(ctx, GP_WIDGETS_COL_ALERT);
 		*fg = gp_widgets_color(ctx, GP_WIDGETS_COL_FG);
 		return;
 	}
@@ -137,14 +139,14 @@ static void draw_cell(gp_pixmap *p, const gp_widget_render_ctx *ctx,
 	char buf[8];
 	int ox;
 
-	bg = gp_widgets_color(ctx, code == gui.code ? GP_WIDGETS_COL_SELECT
-	                                            : GP_WIDGETS_COL_FG);
+	bg = code == gui.code ? gp_widgets_color(ctx, GP_WIDGETS_COL_SELECT)
+	                      : self->bg;
 
 	ink = gp_widgets_color(ctx, GP_WIDGETS_COL_TEXT);
 
 	gp_fill_rect_xywh(p, x, y, self->w, self->h, bg);
 
-	label_bg = ctx->fg_color;
+	label_bg = self->bg;
 	label_fg = have ? ink : gp_widgets_color(ctx, GP_WIDGETS_COL_DISABLED);
 
 	label_colors(ctx, code, have, &label_bg, &label_fg);

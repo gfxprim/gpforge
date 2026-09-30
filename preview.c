@@ -295,8 +295,8 @@ static void draw_variant(gp_pixmap *p, const gp_widget_render_ctx *ctx,
 	int ox, oy;
 	gp_pixel bg, fg;
 
-	bg = gp_widgets_color(ctx, id == gui.variant ? GP_WIDGETS_COL_SELECT
-	                                             : GP_WIDGETS_COL_FG);
+	bg = id == gui.variant ? gp_widgets_color(ctx, GP_WIDGETS_COL_SELECT)
+	                       : gpf_gui_back_color(gui.strip);
 	fg = gp_widgets_color(ctx, GP_WIDGETS_COL_TEXT);
 
 	gp_fill_rect_xywh(p, x, 0, cell_w, p->h, bg);
@@ -348,7 +348,7 @@ void gpf_strip_draw(gp_widget *self)
 	if (!p)
 		return;
 
-	gp_fill(p, gp_widgets_color(ctx, GP_WIDGETS_COL_FG));
+	gp_fill(p, gpf_gui_back_color(self));
 
 	if (!gui.font)
 		return;
@@ -433,6 +433,8 @@ static int deps_grid(gp_pixmap *p, struct gpf_cell *cell, unsigned int *cols,
 
 	gpf_cell_init(cell, ctx, p->h);
 
+	cell->bg = gpf_gui_back_color(gui.deps);
+
 	*cols = GPF_MAX(1u, p->w / cell->w);
 	*rows = GPF_MAX(1u, p->h / cell->h);
 
@@ -516,7 +518,7 @@ void gpf_deps_draw(gp_widget *self)
 	int compose;
 
 	if (p)
-		gp_fill(p, gp_widgets_color(ctx, GP_WIDGETS_COL_FG));
+		gp_fill(p, gp_widgets_color(ctx, GP_WIDGETS_COL_BG));
 
 	if (deps_grid(p, &cell, &cols, &rows))
 		return;

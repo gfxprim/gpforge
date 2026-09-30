@@ -935,6 +935,9 @@ static int pixmap_event(gp_widget_event *ev, void (*draw)(gp_widget *self))
 	break;
 	case GP_WIDGET_EVENT_COLOR_SCHEME:
 	break;
+	/* the library redraws the widget right after this */
+	case GP_WIDGET_EVENT_FOCUS:
+	break;
 	default:
 		return 0;
 	}
@@ -1095,6 +1098,16 @@ out:
  * The pixel multiplier the glyphs are drawn with, so that the table stays
  * readable on a dense display.
  */
+gp_pixel gpf_gui_back_color(gp_widget *self)
+{
+	const gp_widget_render_ctx *ctx = gp_widgets_render_ctx();
+
+	if (self && self->focused)
+		return gp_widgets_color(ctx, GP_WIDGETS_COL_FG);
+
+	return gp_widgets_color(ctx, GP_WIDGETS_COL_BG);
+}
+
 /*
  * The canvas multiplier is fitted to the widget once and then it is the
  * user's, which is why it is set from the drawing as well as from the spinner.
@@ -2450,18 +2463,22 @@ int main(int argc, char *argv[])
 
 	gp_widget_events_unmask(gui.canvas, GP_WIDGET_EVENT_RESIZE |
 	                                    GP_WIDGET_EVENT_COLOR_SCHEME |
-	                                    GP_WIDGET_EVENT_INPUT);
+	                                    GP_WIDGET_EVENT_INPUT |
+	                                    GP_WIDGET_EVENT_FOCUS);
 	gp_widget_events_unmask(gui.strip, GP_WIDGET_EVENT_RESIZE |
 	                                   GP_WIDGET_EVENT_COLOR_SCHEME |
-	                                   GP_WIDGET_EVENT_INPUT);
+	                                   GP_WIDGET_EVENT_INPUT |
+	                                   GP_WIDGET_EVENT_FOCUS);
 	gp_widget_events_unmask(gui.deps, GP_WIDGET_EVENT_RESIZE |
 	                                  GP_WIDGET_EVENT_COLOR_SCHEME |
-	                                  GP_WIDGET_EVENT_INPUT);
+	                                  GP_WIDGET_EVENT_INPUT |
+	                                  GP_WIDGET_EVENT_FOCUS);
 	gp_widget_events_unmask(gui.preview, GP_WIDGET_EVENT_RESIZE |
 	                                     GP_WIDGET_EVENT_COLOR_SCHEME);
 	gp_widget_events_unmask(gui.browser, GP_WIDGET_EVENT_RESIZE |
 	                                     GP_WIDGET_EVENT_COLOR_SCHEME |
-	                                     GP_WIDGET_EVENT_INPUT);
+	                                     GP_WIDGET_EVENT_INPUT |
+	                                     GP_WIDGET_EVENT_FOCUS);
 
 	gui.family_label = gp_widget_by_uid(gui.uids, "family", GP_WIDGET_LABEL);
 

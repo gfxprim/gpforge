@@ -239,6 +239,17 @@ unsigned int gpf_gui_accented(uint32_t *codes, unsigned int max);
 void gpf_gui_set_block(unsigned int block);
 
 /**
+ * @brief The color a widget is drawn on.
+ *
+ * The foreground color while the widget is focused, which is when the keys
+ * work on it, and the background color otherwise.
+ *
+ * @param self A widget.
+ * @return A pixel value.
+ */
+gp_pixel gpf_gui_back_color(gp_widget *self);
+
+/**
  * @brief Sets the canvas zoom and the spinner that shows it.
  *
  * @param zoom The pixel multiplier, at least one.

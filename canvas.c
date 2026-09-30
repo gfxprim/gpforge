@@ -122,10 +122,22 @@ static int hit(const struct canvas *self, int x, int y, int *col, int *height)
 	return 0;
 }
 
+/*
+ * The canvas is drawn on gpf_gui_back_color() and the grid in the other one of
+ * the foreground and the background colors.
+ */
+static gp_pixel grid_color(const gp_widget_render_ctx *ctx)
+{
+	if (gui.canvas && gui.canvas->focused)
+		return gp_widgets_color(ctx, GP_WIDGETS_COL_BG);
+
+	return gp_widgets_color(ctx, GP_WIDGETS_COL_FG);
+}
+
 static void draw_grid(const struct canvas *self, gp_pixmap *p,
                       const gp_widget_render_ctx *ctx)
 {
-	gp_pixel col = gp_widgets_color(ctx, GP_WIDGETS_COL_BG);
+	gp_pixel col = grid_color(ctx);
 	int i;
 
 	if (self->zoom < 4)
@@ -218,8 +230,7 @@ static int draw_pos(gp_pixmap *p, const gp_widget_render_ctx *ctx)
 	return MARGIN + gp_print(p, ctx->font_mono, MARGIN, MARGIN,
 	                         GP_ALIGN_RIGHT | GP_VALIGN_BELOW,
 	                         gp_widgets_color(ctx, GP_WIDGETS_COL_TEXT),
-	                         gp_widgets_color(ctx, GP_WIDGETS_COL_FG),
-	                         "%*i,%-*i",
+	                         gpf_gui_back_color(gui.canvas), "%*i,%-*i",
 	                         RULE_CHARS, gui.cur_col,
 	                         RULE_CHARS, gui.cur_height);
 }
@@ -251,7 +262,7 @@ static void draw_rulers(const struct canvas *self, gp_pixmap *p,
 {
 	const gp_text_style *font = ctx->font_mono;
 	gp_pixel fg = gp_widgets_color(ctx, GP_WIDGETS_COL_TEXT);
-	gp_pixel bg = gp_widgets_color(ctx, GP_WIDGETS_COL_FG);
+	gp_pixel bg = gpf_gui_back_color(gui.canvas);
 	int num_w = gp_text_max_width(font, RULE_CHARS);
 	int step, i;
 
@@ -294,7 +305,7 @@ void gpf_canvas_draw(gp_widget *self)
 	if (!p)
 		return;
 
-	gp_fill(p, gp_widgets_color(ctx, GP_WIDGETS_COL_FG));
+	gp_fill(p, gpf_gui_back_color(gui.canvas));
 
 	/* no font open, an empty canvas is the whole of it */
 	if (!gui.font)
