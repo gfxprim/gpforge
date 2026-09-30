@@ -21,7 +21,12 @@ struct canvas {
 	int zoom;
 	/* where the origin and the baseline land in the pixmap */
 	int ox, oy;
+	/* the room left of and above the grid, where it is numbered */
+	int rule_w, rule_h;
 };
+
+/* the widest number the rulers show, and the position has two of them */
+#define RULE_CHARS 3
 
 static int glyph_advance(void)
 {
@@ -46,6 +51,7 @@ static int glyph_advance(void)
 
 static void geometry(struct canvas *self, gp_pixmap *p)
 {
+	const gp_widget_render_ctx *ctx = gp_widgets_render_ctx();
 	struct gpf_font *font = gui.font;
 	int zx, zy;
 
@@ -54,8 +60,13 @@ static void geometry(struct canvas *self, gp_pixmap *p)
 	self->left = -SLACK;
 	self->right = glyph_advance() + SLACK;
 
-	zx = (p->w - 2 * MARGIN) / GPF_MAX(1, self->right - self->left);
-	zy = (p->h - 2 * MARGIN) / GPF_MAX(1, self->top - self->bottom);
+	self->rule_w = gp_text_max_width(ctx->font_mono, RULE_CHARS) + 2 * MARGIN;
+	self->rule_h = gp_text_height(ctx->font_mono) + 2 * MARGIN;
+
+	zx = ((int)p->w - self->rule_w - MARGIN) /
+	     GPF_MAX(1, self->right - self->left);
+	zy = ((int)p->h - self->rule_h - MARGIN) /
+	     GPF_MAX(1, self->top - self->bottom);
 
 	/*
 	 * The canvas starts at whatever multiplier fits the widget and the
@@ -67,9 +78,14 @@ static void geometry(struct canvas *self, gp_pixmap *p)
 
 	self->zoom = gui.canvas_zoom;
 
-	self->ox = ((int)p->w - (self->right - self->left) * self->zoom) / 2
+	/* centred in what the rulers leave */
+	self->ox = self->rule_w +
+	           ((int)p->w - self->rule_w -
+	            (self->right - self->left) * self->zoom) / 2
 	           - self->left * self->zoom;
-	self->oy = ((int)p->h - (self->top - self->bottom) * self->zoom) / 2
+	self->oy = self->rule_h +
+	           ((int)p->h - self->rule_h -
+	            (self->top - self->bottom) * self->zoom) / 2
 	           + self->top * self->zoom;
 }
 
@@ -174,7 +190,7 @@ static void draw_ink(const struct canvas *self, gp_pixmap *p,
 
 /*
  * The pixel the keyboard edits, drawn as a frame so that it is visible on ink
- * and on background alike.
+ * and on background alike.  The mouse moves it too, there is one cursor.
  */
 static void draw_cursor(const struct canvas *self, gp_pixmap *p,
                         const gp_widget_render_ctx *ctx)
@@ -189,6 +205,82 @@ static void draw_cursor(const struct canvas *self, gp_pixmap *p,
 		return;
 
 	gp_rect_xywh(p, x, y, self->zoom, self->zoom, col);
+}
+
+/*
+ * The cursor position in the glyph coordinates, the column right of the origin
+ * and the height above the baseline, the same numbers the bearings are in.
+ * Drawn in the corner where the rulers meet, padded to a constant width so
+ * that the comma stays in place as the cursor moves.  Returns where it ends.
+ */
+static int draw_pos(gp_pixmap *p, const gp_widget_render_ctx *ctx)
+{
+	return MARGIN + gp_print(p, ctx->font_mono, MARGIN, MARGIN,
+	                         GP_ALIGN_RIGHT | GP_VALIGN_BELOW,
+	                         gp_widgets_color(ctx, GP_WIDGETS_COL_TEXT),
+	                         gp_widgets_color(ctx, GP_WIDGETS_COL_FG),
+	                         "%*i,%-*i",
+	                         RULE_CHARS, gui.cur_col,
+	                         RULE_CHARS, gui.cur_height);
+}
+
+/*
+ * Every how many pixels a ruler is numbered: all of them when the numbers fit,
+ * every second, fifth, tenth... when they do not.  Zero is always numbered.
+ */
+static int rule_step(int zoom, int size)
+{
+	static const int steps[] = {1, 2, 5, 10, 20, 50, 100};
+	unsigned int i;
+
+	for (i = 0; i < GP_ARRAY_SIZE(steps); i++) {
+		if (steps[i] * zoom >= size)
+			return steps[i];
+	}
+
+	return steps[GP_ARRAY_SIZE(steps) - 1];
+}
+
+/*
+ * The columns numbered above the grid and the heights left of it, in the same
+ * coordinates as the position.  A column number that would run into the
+ * position is left out.
+ */
+static void draw_rulers(const struct canvas *self, gp_pixmap *p,
+                        const gp_widget_render_ctx *ctx, int pos_end)
+{
+	const gp_text_style *font = ctx->font_mono;
+	gp_pixel fg = gp_widgets_color(ctx, GP_WIDGETS_COL_TEXT);
+	gp_pixel bg = gp_widgets_color(ctx, GP_WIDGETS_COL_FG);
+	int num_w = gp_text_max_width(font, RULE_CHARS);
+	int step, i;
+
+	step = rule_step(self->zoom, num_w + MARGIN);
+
+	for (i = self->left; i < self->right; i++) {
+		int x = cx(self, i) + self->zoom / 2;
+
+		if (i % step)
+			continue;
+
+		if (x - num_w / 2 < pos_end + MARGIN &&
+		    cy(self, self->top) - MARGIN < self->rule_h)
+			continue;
+
+		gp_print(p, font, x, cy(self, self->top) - MARGIN,
+		         GP_ALIGN_CENTER | GP_VALIGN_ABOVE, fg, bg, "%i", i);
+	}
+
+	step = rule_step(self->zoom, gp_text_height(font));
+
+	for (i = self->bottom + 1; i <= self->top; i++) {
+		if (i % step)
+			continue;
+
+		gp_print(p, font, cx(self, self->left) - MARGIN,
+		         cy(self, i) + self->zoom / 2,
+		         GP_ALIGN_LEFT | GP_VALIGN_CENTER, fg, bg, "%i", i);
+	}
 }
 
 void gpf_canvas_draw(gp_widget *self)
@@ -221,6 +313,7 @@ void gpf_canvas_draw(gp_widget *self)
 	}
 
 	draw_cursor(&canvas, p, ctx);
+	draw_rulers(&canvas, p, ctx, draw_pos(p, ctx));
 }
 
 /*
@@ -368,6 +461,36 @@ static int motion(int x, int y)
 	return 1;
 }
 
+/*
+ * The keyboard cursor follows the mouse, so that there is only one cursor and
+ * the space toggles the pixel the mouse points at.
+ */
+static int hover(int x, int y)
+{
+	gp_pixmap *p = gp_widget_pixmap_get(gui.canvas);
+	struct canvas canvas;
+	int col, height;
+
+	if (!p)
+		return 0;
+
+	geometry(&canvas, p);
+
+	if (hit(&canvas, x, y, &col, &height))
+		return 0;
+
+	if (col == gui.cur_col && height == gui.cur_height)
+		return 1;
+
+	gui.cur_col = col;
+	gui.cur_height = height;
+
+	gpf_canvas_draw(gui.canvas);
+	gp_widget_redraw(gui.canvas);
+
+	return 1;
+}
+
 static int release(void)
 {
 	if (!gui.in_stroke)
@@ -490,9 +613,10 @@ int gpf_canvas_input(gp_event *ev)
 	case GP_EV_REL:
 		switch (ev->code) {
 		case GP_EV_REL_POS:
-		       if (gui.in_stroke)
+			if (gui.in_stroke)
 				return motion(ev->st->cursor_x, ev->st->cursor_y);
-		break;
+
+			return hover(ev->st->cursor_x, ev->st->cursor_y);
 		case GP_EV_REL_WHEEL:
 			return zoom(ev->val);
 		break;

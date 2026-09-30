@@ -22,7 +22,8 @@
 /**
  * @brief Paints the selected glyph, enlarged, into the canvas pixmap.
  *
- * Draws the pixel grid, the ink, the metric lines and the keyboard cursor.
+ * Draws the pixel grid with its columns and rows numbered, the ink, the metric
+ * lines, the cursor and its position.
  * With no font open it fills the background and returns.
  *
  * @param self The canvas pixmap widget.
@@ -34,9 +35,9 @@ void gpf_canvas_draw(gp_widget *self);
  *
  * A press starts a stroke, or drags the advance or the origin when it lands on
  * one of their lines, motion continues it and a release commits it as one undo
- * entry.  The arrows move the keyboard cursor, space toggles the pixel under
- * it, shift and the arrows move the ink, alt makes a step five pixels, and the
- * wheel zooms.
+ * entry.  The arrows move the cursor, and so does the mouse, space toggles the
+ * pixel under it, shift and the arrows move the ink, alt makes a step five
+ * pixels, and the wheel zooms.
  *
  * @param ev An input event.
  * @return Non-zero when the event was handled.
