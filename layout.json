@@ -81,7 +81,8 @@
      {"type": "spinner", "min": -32, "max": 64, "val": 0, "uid": "bearing_y",
       "on_event": "bearing_y_on_event"},
      {"type": "pixmap", "w": "0px 8pad 26asc", "h": "0px 2pad 5asc", "uid": "strip",
-      "on_event": "strip_on_event"}
+      "on_event": "strip_on_event"},
+     {"type": "button", "btype": "clear", "on_event": "glyph_clear_on_event"}
    ]},
    {"type": "label", "uid": "lint", "text": "", "width": 16,
     "tattr": "mono|left", "halign": "fill"},

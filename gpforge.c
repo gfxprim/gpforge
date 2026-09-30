@@ -1251,6 +1251,24 @@ static int glyph_range_del_on_event(gp_widget_event *ev)
 	return 0;
 }
 
+/*
+ * The letter in every variant, not just the one being edited: the glyph
+ * delete button drops the overlay of one variant and the letter falls back to
+ * what the others have, this is what gets rid of it.
+ */
+static int glyph_clear_on_event(gp_widget_event *ev)
+{
+	if (ev->type != GP_WIDGET_EVENT_WIDGET || !gui.font)
+		return 0;
+
+	if (!gpf_font_range_glyphs(gui.font, gui.code, gui.code))
+		return 0;
+
+	delete_range(gui.code, gui.code);
+
+	return 0;
+}
+
 static const char *blocks_get_choice(gp_widget *self, size_t idx)
 {
 	static char bufs[4][64];
@@ -2331,6 +2349,7 @@ static const gp_widget_json_addr app_callbacks[] = {
 	{.id = "family_on_event", .on_event = family_on_event},
 	{.id = "flip_h_on_event", .on_event = flip_h_on_event},
 	{.id = "flip_v_on_event", .on_event = flip_v_on_event},
+	{.id = "glyph_clear_on_event", .on_event = glyph_clear_on_event},
 	{.id = "glyph_del_on_event", .on_event = glyph_del_on_event},
 	{.id = "glyph_range_del_on_event", .on_event = glyph_range_del_on_event},
 	{.id = "lint_on_event", .on_event = lint_on_event},
