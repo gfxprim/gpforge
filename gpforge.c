@@ -153,6 +153,33 @@ static void update_lint_count(void)
 	lint_count_set(gui.lint_warnings, buf);
 }
 
+static void set_lint_label(struct gpf_lint_finding *finding)
+{
+	if (!gui.lint_label)
+		return;
+
+	if (!finding) {
+		gp_widget_label_set(gui.lint_label, "");
+		gp_widget_label_colors_set(gui.lint_label, GP_WIDGETS_COL_TEXT, GP_WIDGETS_COL_BG);
+		return;
+	}
+
+	gp_widget_label_printf(gui.lint_label, " U+%04X %s: %s",
+	                       gui.code,
+	                       gpf_lint_severity_name(finding->sev),
+	                       finding->msg);
+
+	switch (finding->sev) {
+	case GPF_LINT_ERROR:
+		gp_widget_label_colors_set(gui.lint_label, GP_WIDGETS_COL_TEXT, GP_WIDGETS_COL_ALERT);
+	break;
+	case GPF_LINT_WARN:
+		gp_widget_label_colors_set(gui.lint_label, GP_WIDGETS_COL_TEXT, GP_WIDGETS_COL_WARN);
+	break;
+	}
+
+}
+
 static void update_status(void)
 {
 	struct gpf_resolved res;
@@ -165,10 +192,7 @@ static void update_status(void)
 
 	if (!gui.font) {
 		update_metrics();
-
-		if (gui.lint_label)
-			gp_widget_label_set(gui.lint_label, "");
-
+		set_lint_label(NULL);
 		gp_widget_label_set(gui.status, "no font open");
 		return;
 	}
@@ -180,14 +204,10 @@ static void update_status(void)
 
 	/* what is wrong with this glyph, on a line of its own so it can be read */
 	if (gui.lint_label) {
-		if (gpf_lint_glyph(gui.font, gui.variant, gui.code, &finding)) {
-			gp_widget_label_set(gui.lint_label, "");
-		} else {
-			gp_widget_label_printf(gui.lint_label, "U+%04X %s: %s",
-			                       gui.code,
-			                       gpf_lint_severity_name(finding.sev),
-			                       finding.msg);
-		}
+		if (gpf_lint_glyph(gui.font, gui.variant, gui.code, &finding))
+			set_lint_label(NULL);
+		else
+			set_lint_label(&finding);
 	}
 
 	if (gpf_resolve(gui.font, gui.variant, gui.code, &res)) {
