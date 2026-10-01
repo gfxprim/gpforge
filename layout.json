@@ -70,22 +70,24 @@
        ]}
      ], "cell-fill": "0, 5, 1"}
    ]},
-   {"type": "hbox", "widgets": [
-     {"type": "label", "uid": "status", "text": "", "width": 34, "tattr": "mono"},
-     {"type": "label", "text": "adv"},
-     {"type": "spinner", "min": 0, "max": 64, "val": 0, "uid": "advance",
-      "on_event": "advance_on_event"},
-     {"type": "label", "text": "brg"},
-     {"type": "spinner", "min": -32, "max": 64, "val": 0, "uid": "bearing_x",
-      "on_event": "bearing_x_on_event"},
-     {"type": "spinner", "min": -32, "max": 64, "val": 0, "uid": "bearing_y",
-      "on_event": "bearing_y_on_event"},
+   {"type": "hbox", "border": "none", "align": "fill", "widgets": [
+     {"type": "label", "uid": "status", "text": "", "tattr": "mono", "align": "center"},
+     {"type": "grid", "uniform": true, "border": 0, "cols": 3, "rows": 2, "widgets": [
+      {"type": "label", "text": "bearing x"},
+      {"type": "spinner", "min": -32, "max": 64, "val": 0, "uid": "bearing_x",
+       "on_event": "bearing_x_on_event", "halign": "fill"},
+      {"type": "label", "text": "bearing y"},
+      {"type": "spinner", "min": -32, "max": 64, "val": 0, "uid": "bearing_y",
+       "on_event": "bearing_y_on_event", "halign": "fill"},
+      {"type": "label", "text": "advance x"},
+      {"type": "spinner", "min": 0, "max": 64, "val": 0, "uid": "advance",
+       "on_event": "advance_on_event", "halign": "fill"}
+      ]
+     },
      {"type": "pixmap", "w": "0px 8pad 26asc", "h": "0px 2pad 5asc", "uid": "strip",
       "on_event": "strip_on_event"},
-     {"type": "button", "btype": "clear", "on_event": "glyph_clear_on_event"}
+     {"type": "button", "btype": "clear", "align": "fill", "on_event": "glyph_clear_on_event"}
    ]},
-   {"type": "label", "uid": "lint", "text": "", "width": 16,
-    "tattr": "mono|left", "halign": "fill"},
    {"type": "hbox", "halign": "fill", "border": "none", "widgets": [
      {"type": "tbox", "uid": "preview_text", "len": 40, "halign": "fill",
       "help": "preview text", "on_event": "preview_text_on_event"},
@@ -94,7 +96,9 @@
      {"type": "checkbox", "label": "overline", "on_event": "rule_over_on_event"}
    ], "cell-fill": "1, 0, 0, 0"},
    {"type": "pixmap", "w": "0px 4pad 40asc", "h": "160px", "align": "fill",
-    "uid": "preview", "on_event": "preview_on_event"}
-  ], "cell-fill": "0, 1, 0, 0, 0, 1"
+    "uid": "preview", "on_event": "preview_on_event"},
+   {"type": "label", "uid": "lint", "text": "",
+    "tattr": "mono|left", "halign": "fill"}
+  ], "cell-fill": "0, 1, 0, 0, 1, 0"
  }
 }
