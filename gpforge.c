@@ -914,9 +914,27 @@ void gpf_gui_sync_block(unsigned int block)
 
 void gpf_gui_set_variant(enum gpf_variant_id id)
 {
+	if (gui.variant == id)
+		return;
+
 	gui.variant = id;
 
 	gpf_gui_redraw();
+}
+
+void gpf_gui_move_variant(int offset)
+{
+	int new_variant = gui.variant;
+
+	new_variant += offset;
+
+	if (new_variant < 0)
+		new_variant = 0;
+
+	if (new_variant >= GPF_VARIANTS)
+		new_variant = GPF_VARIANTS-1;
+
+	gpf_gui_set_variant(new_variant);
 }
 
 void gpf_pixmap_resize(gp_widget_event *ev)

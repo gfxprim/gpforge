@@ -274,6 +274,13 @@ void gpf_gui_sync_block(unsigned int block);
 void gpf_gui_set_variant(enum gpf_variant_id id);
 
 /**
+ * @brief Moves the current variant in the variant ordering.
+ *
+ * @param offset How much the variant should be moved.
+ */
+void gpf_gui_move_variant(int offset);
+
+/**
  * @brief Repaints everything that shows the font.
  *
  * During a stroke only the canvas and the accented letters strip are

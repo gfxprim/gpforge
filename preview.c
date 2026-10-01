@@ -615,23 +615,42 @@ int gpf_strip_input(gp_event *ev)
 	gp_pixmap *p = gp_widget_pixmap_get(gui.strip);
 	unsigned int cell_w, id;
 
-	if (!gui.font)
+	if (!gui.font || !p)
 		return 0;
 
-	if (!p || ev->type != GP_EV_KEY || ev->code != GP_EV_KEY_DOWN)
+	if (ev->type == GP_EV_REL && ev->code == GP_EV_REL_WHEEL) {
+		gpf_gui_move_variant(ev->val);
+		return 1;
+	}
+
+	if (ev->type != GP_EV_KEY || ev->code != GP_EV_KEY_DOWN)
 		return 0;
 
-	if (ev->key.key != GP_BTN_LEFT && ev->key.key != GP_BTN_TOUCH)
-		return 0;
+	switch (ev->key.key) {
+	case GP_BTN_LEFT:
+	case GP_BTN_TOUCH:
+		cell_w = GPF_MAX(1u, p->w / GPF_VARIANTS);
+		id = ev->st->cursor_x / cell_w;
+		if (id >= GPF_VARIANTS)
+			return 0;
 
-	cell_w = GPF_MAX(1u, p->w / GPF_VARIANTS);
+		gpf_gui_set_variant(id);
 
-	id = ev->st->cursor_x / cell_w;
+		return 1;
+	break;
+	case GP_KEY_LEFT:
+		gpf_gui_move_variant(-1);
+	break;
+	case GP_KEY_RIGHT:
+		gpf_gui_move_variant(1);
+	break;
+	case GP_KEY_HOME:
+		gpf_gui_set_variant(0);
+	break;
+	case GP_KEY_END:
+		gpf_gui_set_variant(GPF_VARIANTS-1);
+	break;
+	}
 
-	if (id >= GPF_VARIANTS)
-		return 0;
-
-	gpf_gui_set_variant(id);
-
-	return 1;
+	return 0;
 }
