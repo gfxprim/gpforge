@@ -33,7 +33,12 @@
 struct gpf_block_sel {
 	/** @brief The block, by its first codepoint: indices move on a rebuild. */
 	uint32_t min;
-	/** @brief The glyph selected in it. */
+	/** @brief The glyph selected in its table. */
+	uint32_t table;
+	/**
+	 * @brief The glyph selected, the table one or one picked from the
+	 *        accented letters strip, which may be out of the block.
+	 */
 	uint32_t code;
 };
 

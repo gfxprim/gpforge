@@ -782,10 +782,13 @@ void gpf_gui_redraw(void)
 }
 
 /*
- * Remembers the selection for the block it is in, so that switching back to
- * the block with the selector puts it back.
+ * Remembers the selection for the block, so that switching back to the block
+ * with the selector puts it back.  A glyph picked out of the accented letters
+ * strip is often in another block, 'Č' picked while browsing 'C', and it is
+ * remembered for the block being browsed, next to the glyph the table has
+ * selected.
  */
-static void remember_sel(uint32_t code)
+static void remember_sel(uint32_t code, int follow)
 {
 	const struct gpf_ucode_block *blocks = gpf_gui_blocks();
 	struct gpf_block_sel sel;
@@ -795,18 +798,30 @@ static void remember_sel(uint32_t code)
 	if (!blocks)
 		return;
 
-	idx = gpf_blocks_find(blocks, code);
-	if (idx < 0)
+	idx = follow ? gpf_blocks_find(blocks, code) : (int)gui.block;
+	if (idx < 0 || (size_t)idx >= gp_vec_len(blocks))
 		return;
 
 	sel.min = blocks[idx].min;
 	sel.code = code;
 
+	/* a strip pick outside of the block keeps the table selection */
+	if (code >= blocks[idx].min && code <= blocks[idx].max)
+		sel.table = code;
+	else
+		sel.table = blocks[idx].min;
+
 	for (i = 0; i < gp_vec_len(gui.block_sels); i++) {
-		if (gui.block_sels[i].min == sel.min) {
-			gui.block_sels[i].code = code;
-			return;
-		}
+		struct gpf_block_sel *cur = &gui.block_sels[i];
+
+		if (cur->min != sel.min)
+			continue;
+
+		if (sel.table != code)
+			sel.table = cur->table;
+
+		*cur = sel;
+		return;
 	}
 
 	if (!gui.block_sels)
@@ -817,29 +832,36 @@ static void remember_sel(uint32_t code)
 }
 
 /*
- * The glyph selected last in a block, or its first codepoint when none was.
- * A remembered glyph that is out of the block, which was redefined since, does
- * not count.
+ * Selects what was selected in a block last, or its first codepoint when
+ * nothing was.  A remembered glyph that is out of the block, which was
+ * redefined since, does not count.
  */
-static uint32_t remembered_sel(const struct gpf_ucode_block *block)
+static void restore_sel(const struct gpf_ucode_block *block)
 {
 	size_t i;
 
 	for (i = 0; i < gp_vec_len(gui.block_sels); i++) {
-		const struct gpf_block_sel *sel = &gui.block_sels[i];
+		struct gpf_block_sel sel = gui.block_sels[i];
 
-		if (sel->min == block->min && sel->code <= block->max)
-			return sel->code;
+		if (sel.min != block->min || sel.table > block->max)
+			continue;
+
+		gpf_gui_select(sel.table);
+
+		if (sel.code != sel.table)
+			gpf_gui_select_keep(sel.code);
+
+		return;
 	}
 
-	return block->min;
+	gpf_gui_select(block->min);
 }
 
 static void select_code(uint32_t code, int follow)
 {
 	gui.code = code;
 
-	remember_sel(code);
+	remember_sel(code, follow);
 
 	if (follow)
 		gpf_browser_show_sel();
@@ -1260,7 +1282,7 @@ static int blocks_on_event(gp_widget_event *ev)
 	/* back to where we were in the block, or to its start */
 	block = gpf_gui_block();
 	if (block)
-		gpf_gui_select(remembered_sel(block));
+		restore_sel(block);
 
 	return 0;
 }
